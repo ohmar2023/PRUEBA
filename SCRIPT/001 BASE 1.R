@@ -7,11 +7,10 @@ library(janitor)
 
 base <- read_excel("DATA/PRUEBA COORDINADOR DM.XLSX",sheet = "Base 1") %>% 
   clean_names() %>% 
-  mutate(codigo_id = as.character(codigo_id),
-         marca_mora_tarjeta = as.numeric(marca_mora_tarjeta)
-         ) %>% 
+  mutate(codigo_id = as.character(codigo_id)) %>% 
   filter(!is.na(codigo_id))
-base_entrenamiento$marca_mora_tarjeta <- as.integer(base_entrenamiento$marca_mora_tarjeta)
+
+base$marca_mora_tarjeta <- as.integer(base$marca_mora_tarjeta)
 
 summary(base)
 
@@ -40,10 +39,6 @@ i_train <- sample(1:f, 2/3*f )
 base_entrenamiento <- base[i_train, ] 
 base_test <- base[-i_train, ]
 
-
-table(base$loan_status,model_pred)
-
-
 # Modelo ------------------------------------------------------------------
 
 
@@ -56,17 +51,20 @@ modelos_a <- glm(marca_mora_tarjeta~edad +
       segmento_riesgo +
       forma_pago + 
       saldo_total_tarjeta +
-      cupo_promedio_tarjeta +
+      #cupo_promedio_tarjeta +
       promedio_mensual_consumos_locales +
       marca_cuenta_corriente + 
       marca_cuenta_ahorros +  
-      sucursal +
+      #sucursal +
       #valor_deposito_a_plazo +
       instruccion,
     data = base_entrenamiento)
 
 predicciones_a <- predict(modelos_a,newdata = base_test, type = "response")
 range(predicciones_a)
+
+aux <- predict(modelos_a,newdata = base_entrenamiento, type = "response")
+range(aux)
 
 str(base_entrenamiento)
 
